@@ -205,6 +205,47 @@ begin
         id = p_id;
 commit;
 end;
+--Таблица link
+CREATE TABLE link (
+    id INTEGER NOT NULL CONSTRAINT link_pk PRIMARY KEY,
+    in_id INTEGER NOT NULL REFERENCES STATION(ID),
+    out_id INTEGER NOT NULL REFERENCES STATION(ID)
+)
+create SEQUENCE sq_link start with 1;
+create or replace trigger tg_link
+BEFORE INSERT ON POINT
+FOR EACH ROW 
+BEGIN
+ select SQ_ROUTE.NEXTVAL
+ into :new.id
+ from dual;
+END;
+
+create or replace PROCEDURE link_insert(link_in_id in INTEGER, link_out_id in INTEGER)
+is
+BEGIN
+    INSERT into link (in_id, out_id)
+    values (link_in_id, link_out_id);
+COMMIT;
+END;
+create or replace PROCEDURE link_update(link_id in INTEGER,link_in_id in INTEGER, link_out_id in INTEGER)
+is
+BEGIN
+update link SET
+        in_id = link_in_id,
+        out_id = link_out_id
+        WHERE
+        id = link_id;
+commit;
+END;
+create or replace PROCEDURE link_delete(link_id in INTEGER)
+is
+BEGIN
+delete from link
+WHERE
+id = link_id;
+commit;
+END;
 --Таблица Point
 CREATE TABLE point (
     id              INTEGER NOT NULL CONSTRAINT point_pk PRIMARY KEY,
