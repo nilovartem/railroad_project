@@ -143,8 +143,8 @@ class DjangoSession(models.Model):
 
 class Link(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    in_field = models.ForeignKey('Station', models.DO_NOTHING, db_column='in_id',related_name='in_station')  # Field renamed because it was a Python reserved word.
-    out = models.ForeignKey('Station', models.DO_NOTHING,related_name='out_station')
+    in_field = models.ForeignKey('Station', models.DO_NOTHING, db_column='in_id', related_name='in_station')  # Field renamed because it was a Python reserved word.
+    out = models.ForeignKey('Station', models.DO_NOTHING)
     travel_time = models.IntegerField()
 
     class Meta:
@@ -190,8 +190,8 @@ class Ticket(models.Model):
     id = models.BigIntegerField(primary_key=True)
     price = models.DecimalField(max_digits=5, decimal_places=2)
     purchase_date = models.DateField()
-    arrival_station = models.ForeignKey(Station, models.DO_NOTHING,related_name='arrival_station')
-    departure_station = models.ForeignKey(Station, models.DO_NOTHING,name='departure_station')
+    arrival_station = models.ForeignKey(Station, models.DO_NOTHING, related_name='arrival_station')
+    departure_station = models.ForeignKey(Station, models.DO_NOTHING, related_name='depature_station')
 
     class Meta:
         managed = False
@@ -211,6 +211,7 @@ class Zone(models.Model):
     id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=5, decimal_places=2)
+    color = models.CharField(max_length=7, blank=True, null=True)
 
     class Meta:
         managed = False

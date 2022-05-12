@@ -1,7 +1,8 @@
 CREATE TABLE zone (
     id     INTEGER NOT NULL CONSTRAINT zone_pk PRIMARY KEY,
 	name   varchar(50) not null,
-    price  NUMBER(5, 2) not null CONSTRAINT zone_price CHECK(price >= 0)
+    price  NUMBER(5, 2) not null CONSTRAINT zone_price CHECK(price >= 0),
+    color varchar2(7)
 );
 create SEQUENCE sq_zone start with 1;
 create or replace trigger tg_zone
@@ -12,19 +13,20 @@ begin
  into :new.id
  from dual;
 end;
-create or replace procedure zone_insert(p_name in varchar,p_price in NUMBER)
+create or replace procedure zone_insert(p_name in varchar,p_price in NUMBER, p_color in VARCHAR2)
 is
 begin
-    insert into zone (name,price)
-        values (p_name,p_price);
+    insert into zone (name,price,color)
+        values (p_name,p_price,p_color);
 commit;
 end;
-create or replace procedure zone_update(p_id in int,p_name in varchar,p_price in NUMBER)
+create or replace procedure zone_update(p_id in int,p_name in varchar,p_price in NUMBER, p_color in VARCHAR2)
 is
 begin
     update zone set
 		name = p_name,
-		price = p_price
+		price = p_price,
+        color = p_color
 		where
         id = p_id;
 commit;

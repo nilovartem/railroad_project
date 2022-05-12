@@ -22,11 +22,12 @@
 {% verbatim %}
 <div class="container" id="railroad_app"></div>
 {% endverbatim %}
-{{stations}}
+<h1 id="station_name"></h1>
+<div id="legend"></div>
 <div id="mynetwork"></div>
 {{ stations|json_script:"stations-data" }}
 {{ links|json_script:"links-data" }}
+{{ zones|json_script:"zones-data" }}
 <script id="mapper" src="static/app.js"></script>
-<h1 id="station_name"></h1>
 </body>
 </html>

@@ -1,1 +1,3 @@
-EXECUTE zone_insert('‘¥¢¥à­ ï §®­  ®¯« âë', 20);
+execute ZONE_INSERT(P_NAME  => 'Ð§ÐµÑ…Ð¾Ð²' /*IN VARCHAR2*/,P_PRICE  => '50' /*IN NUMBER*/,P_COLOR  => '#33cccc' /*IN VARCHAR2*/)
+
+execute ZONE_INSERT(P_NAME  => 'ÐŸÐ»Ð¾Ñ‰Ð°Ð´ÑŒ Ñ‚Ñ€ÐµÑ… Ð²Ð¾ÐºÐ·Ð°Ð»Ð¾Ð²' /*IN VARCHAR2*/,P_PRICE  => '0' /*IN NUMBER*/,P_COLOR  => '#ff9966' /*IN VARCHAR2*/)
