@@ -39,10 +39,10 @@ begin
         id = p_id;
 commit;
 end;
---ñîçäàíèå òàáëèöû ïîåçä
+--ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ Ð¿Ð¾ÐµÐ·Ð´
 CREATE TABLE train (
     id        INTEGER NOT NULL CONSTRAINT train_pk PRIMARY KEY,
-    name 	  VARCHAR2(20) NOT NULL
+    name 	  VARCHAR2(100) NOT NULL
 )
 
 create SEQUENCE sq_train start with 1;
@@ -79,7 +79,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Direction
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° Direction
 CREATE TABLE direction (
     id        INTEGER NOT NULL CONSTRAINT direction_pk PRIMARY KEY,
     name 	  VARCHAR2(50) NOT NULL
@@ -119,7 +119,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Ìàðøðóò
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° ÐœÐ°Ñ€ÑˆÑ€ÑƒÑ‚
 
 CREATE TABLE route (
     id            INTEGER NOT NULL CONSTRAINT route_pk PRIMARY KEY,
@@ -166,7 +166,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Station
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° Station
 CREATE TABLE station (
     id       INTEGER NOT NULL CONSTRAINT station_pk PRIMARY KEY,
     name     VARCHAR2(60) NOT NULL,
@@ -207,7 +207,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Point
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° Point
 CREATE TABLE point (
     id              INTEGER NOT NULL CONSTRAINT point_pk PRIMARY KEY,
     arrival_time    varchar(5) not null CONSTRAINT point_arrival_time check(arrival_time like '__:__'),
@@ -253,7 +253,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Ticket
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° Ticket
 CREATE TABLE ticket (
     id                    INTEGER NOT NULL PRIMARY KEY,
     price                 NUMBER(5, 2) NOT NULL,
@@ -298,7 +298,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Cõåìà íàïðàâëåíèé
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° CÑ…ÐµÐ¼Ð° Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¹
 CREATE TABLE direction_plan (
     id            INTEGER NOT NULL PRIMARY KEY,
     station_id    INTEGER NOT NULL REFERENCES station(id),
@@ -339,7 +339,7 @@ begin
         id = p_id;
 commit;
 end;
---Òàáëèöà Ñâÿçü, íóæíà äëÿ ïîñòðîåíèÿ ãðàôà ñòàíöèé
+--Ð¢Ð°Ð±Ð»Ð¸Ñ†Ð° Ð¡Ð²ÑÐ·ÑŒ, Ð½ÑƒÐ¶Ð½Ð° Ð´Ð»Ñ Ð¿Ð¾ÑÑ‚Ñ€Ð¾ÐµÐ½Ð¸Ñ Ð³Ñ€Ð°Ñ„Ð° ÑÑ‚Ð°Ð½Ñ†Ð¸Ð¹
 CREATE TABLE link (
     id            INTEGER NOT NULL PRIMARY KEY,
     in_id    INTEGER NOT NULL REFERENCES station(id),
@@ -381,8 +381,9 @@ begin
         id = p_id;
 commit;
 end;
---ôóíêöèè
-CREATE OR REPLACE FUNCTION get_ticket_price(f_id_first_station in int,f_id_second_station in int)
+--Ð¤ÑƒÐ½ÐºÑ†Ð¸Ð¸
+--ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ñ†ÐµÐ½Ñƒ ÐµÑ‰Ðµ Ð½Ðµ ÐºÑƒÐ¿Ð»ÐµÐ½Ð½Ð¾Ð³Ð¾ Ð±Ð¸Ð»ÐµÑ‚Ð° Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ð°Ð½Ð¸Ð¸ Ð¸Ð¼ÐµÐ½Ð¸ Ð´Ð²ÑƒÑ… ÑÑ‚Ð°Ð½Ñ†Ð¸Ð¹
+CREATE OR REPLACE FUNCTION get_ticket_price(f_name_first_station in varchar,f_name_second_station in varchar)
 RETURN NUMBER
 IS
 ticket_price NUMBER(5,2);
@@ -390,16 +391,72 @@ first_id_zone INTEGER;
 second_id_zone INTEGER;
 first_price_zone NUMBER;
 second_price_zone NUMBER;
+first_id_station INT;
+second_id_station INT;
+total NUMBER;
 BEGIN
-    SELECT zone_id into first_id_zone from station where id = f_id_first_station;
-    SELECT zone_id into second_id_zone from station where id = f_id_second_station;
+    SELECT id into first_id_station from station where station.name = f_name_first_station;
+    SELECT id into second_id_station from station where station.name = f_name_second_station;
+    SELECT zone_id into first_id_zone from station where id = first_id_station;
+    SELECT zone_id into second_id_zone from station where id = second_id_station;
     SELECT price into first_price_zone from zone where id = first_id_zone;
     SELECT price into second_price_zone from zone where id = second_id_zone;
-    SELECT GREATEST(first_price_zone,second_price_zone) into ticket_price FROM DUAL;
-    RETURN (ticket_price);
+    
+    IF first_price_zone != second_price_zone THEN
+        total := first_price_zone + second_price_zone;
+    ELSE      
+        total := first_price_zone;
+    END IF;
+    
+    return total;    
 END; 
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ
+SELECT GET_TICKET_PRICE('Ð¡Ð°Ð½Ð´Ð°Ñ€Ð¾Ð²Ð¾', 'Ð¡Ñ‚Ð¾Ð»Ð±Ð¾Ð²Ð°Ñ') FROM dual
 
---Ïîëó÷èòü êîëè÷åñòâî ìàðøðóòîâ äëÿ îïðåäåëåííîãî ïîåçäà
+--Ð’Ñ‹Ð²ÐµÑÑ‚Ð¸ ÑÑ‚Ð°Ð½Ñ†Ð¸Ð¸, Ð¼ÐµÐ¶Ð´Ñƒ ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¼Ð¸\Ð¿ÑƒÑ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ Ñ‡ÐµÐ¼ ÑƒÐºÐ°Ð·Ð°Ð½Ð½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¼Ð¸Ð½ÑƒÑ‚
+CREATE OR REPLACE PROCEDURE get_stations_list(estimated_travel_time in float)
+IS
+  stations_list SYS_REFCURSOR;
+BEGIN
+  open stations_list FOR
+  SELECT s1.name first_station_name,
+         s2.name second_station_name,
+         l.travel_time travel_time
+       
+  FROM link l
+       JOIN station s1
+         ON( l.IN_ID =  s1.id)
+       JOIN station s2
+         ON( l.OUT_ID = s2.id)
+  WHERE l.travel_time > estimated_travel_time;
+  DBMS_SQL.RETURN_RESULT(stations_list);
+END get_stations_list;
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ
+exec get_stations_list(60)
+
+--Ð’Ñ‹Ð²ÐµÑÑ‚Ð¸ ÑÐ¿Ð¸ÑÐ¾Ðº Ð±Ð¸Ð»ÐµÑ‚Ð¾Ð², ÐºÑƒÐ¿Ð»ÐµÐ½Ð½Ñ‹Ñ… 10.05.2022
+CREATE OR REPLACE PROCEDURE get_tickets_by_date(p_desired_date in varchar)
+IS
+  tickets_list SYS_REFCURSOR;
+  desired_date DATE; 
+BEGIN
+desired_date := TO_DATE(p_desired_date, 'yyyy/mm/dd');
+open tickets_list FOR
+SELECT s1.name first_station_name,
+       s2.name second_station_name,
+       t.PRICE,
+       t.purchase_date
+FROM ticket t
+    JOIN station s1
+    ON (t.departure_station_id = s1.id)
+    JOIN station s2
+    ON(t.arrival_station_id = s2.id)
+WHERE t.purchase_date = desired_date;
+DBMS_SQL.RETURN_RESULT(tickets_list);
+END get_tickets_by_date;
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ñ
+exec get_tickets_by_date('2022/05/10')
+--ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¼Ð°Ñ€ÑˆÑ€ÑƒÑ‚Ð¾Ð² Ð´Ð»Ñ Ð¿Ð¾ÐµÐ·Ð´Ð° Ñ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð½Ñ‹Ð¼ ID
 CREATE OR REPLACE FUNCTION get_routes_count(f_id_train in int)
 RETURN INTEGER
 IS
@@ -408,27 +465,37 @@ BEGIN
     SELECT COUNT(*) into routes_count FROM route where train_id = f_id_train;
     RETURN (routes_count); 
 END;
---Ïîëó÷èòü êîëè÷åñòâî ñòàíöèé íà íàïðàâëåíèè
-CREATE OR REPLACE FUNCTION get_stations_count(f_id_direction in int)
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
+SELECT GET_ROUTES_COUNT(F_ID_TRAIN  => 22 /*IN NUMBER(38)*/) FROM DUAL
+--ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑÑ‚Ð°Ð½Ñ†Ð¸Ð¹ Ð½Ð° Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ð¸
+CREATE OR REPLACE FUNCTION get_stations_count(f_name_direction in varchar)
 RETURN INTEGER
 IS
 station_count INTEGER;
+f_id_direction INTEGER;
 BEGIN
+    SELECT id into f_id_direction from direction where direction.name = f_name_direction;
     SELECT COUNT(*) into station_count FROM direction_plan where direction_id = f_id_direction;
     RETURN (station_count); 
 END;
---Ïîèñê íàïðàâëåíèÿ ïî ñòàíöèè
-CREATE OR REPLACE FUNCTION get_direction_name(f_id_station in int)
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
+SELECT GET_STATIONS_COUNT('ÐšÑƒÑ€ÑÐºÐ¾Ðµ') FROM DUAL
+--ÐŸÐ¾Ð¸ÑÐº Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¿Ð¾ Ð¸Ð¼ÐµÐ½Ð¸ ÑÑ‚Ð°Ð½Ñ†Ð¸Ð¸
+CREATE OR REPLACE FUNCTION get_direction_name(f_name_station in varchar)
 RETURN VARCHAR
 IS
 direction_name VARCHAR(100);
 selected_direction_id INTEGER;
+selected_station_id INTEGER;
 BEGIN
-    SELECT direction_id into selected_direction_id from direction_plan where station_id = f_id_station;
+    SELECT id into selected_station_id from station where station.name = f_name_station;
+    SELECT direction_id into selected_direction_id from direction_plan where station_id = selected_station_id;
     SELECT name into direction_name from direction where id = selected_direction_id;
     RETURN (direction_name); 
 END;
---Ïîëó÷èòü êîëè÷åñòâî òî÷åê ìàðøðóòîâ, äîáàâèòü âðåìÿ ïðèáûòèÿ è îòïðàâëåíèÿ
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
+SELECT GET_DIRECTION_NAME('Ð¡Ð°Ð½Ð´Ð°Ñ€Ð¾Ð²Ð¾') from dual
+--ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ñ‚Ð¾Ñ‡ÐµÐº Ð¼Ð°Ñ€ÑˆÑ€ÑƒÑ‚Ð°
 CREATE OR REPLACE FUNCTION get_route_points_count(f_id_route in int)
 RETURN INTEGER
 IS
@@ -437,3 +504,5 @@ BEGIN
     SELECT COUNT(*) into points_count FROM point where route_id = f_id_route;
     RETURN (points_count); 
 END;
+--ÐŸÑ€Ð¸Ð¼ÐµÑ€ Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
+SELECT GET_ROUTE_POINTS_COUNT(F_ID_ROUTE  => 1 /*IN NUMBER(38)*/) FROM DUAL

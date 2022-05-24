@@ -20,32 +20,3 @@ def railroad_app(request):
     #pdb.set_trace()
     #pdb.pprint(stationsJSON)
     return render(request, 'main_app.html', {'stations': stationsJSON, 'links': linksJSON, 'zones': zonesJSON})
-def draw():
-    links = Link.objects.aggregate()
-    length = len(links)
-    #pdb.set_trace()
-    net = Network(notebook=True)
-    for link in links:
-        f_id = f'{link.in_field}'
-        s_id = f'{link.out}'
-        net.add_node(1, label=f_id)
-        net.add_node(2, label=s_id)
-    net.add_edge(1, 2, weight=20)
-    net.toggle_physics(False)
-    net.show("templates/scheme.html")
-def example():
-    net = Network(notebook=True)
-    net.add_node(9, label='Молоди')
-    net.add_node(5, label='Столбовая')
-    net.add_node(15, label='66 км')
-    net.add_node(7, label='283 км')
-    net.add_node(50, label='Сандарово', color='Red')
-    
-    net.add_edge(9, 5, weight=7)
-    net.add_edge(5, 15, weight=5)
-    net.add_edge(5,7, weight=6)
-    net.add_edge(7,50, weight=5)
-    net.toggle_physics(False)
-    net.toggle_drag_nodes(True)
-    net.show("templates/scheme.html")
-    #net.toggle_drag_nodes(False)

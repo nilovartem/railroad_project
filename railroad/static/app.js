@@ -45,7 +45,7 @@ var options = {
         },*/
         borderWidth: 1,
         borderWidthSelected: 1,
-        shape: 'square',
+        shape: 'hexagon',
         scaling: {
             label: {
                 enabled: true,
@@ -55,7 +55,7 @@ var options = {
         },
     },
     edges: {
-        physics: false
+        physics: true
     }
 };
 
@@ -64,7 +64,7 @@ var network = new vis.Network(container, data, options);
 network.on('click', function (properties) {
     var ids = properties.nodes;
     var station = nodes.get(ids)
-    routeHandler(station)
+    //routeHandler(station)
     displayStationInfo(station)
 });
 
